@@ -1,0 +1,22 @@
+package com.example.ecommerce.service;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import com.example.ecommerce.dto.CartItemRequest;
+import com.example.ecommerce.dto.CartItemResponse;
+
+@Service
+public class CartService {
+
+	public ResponseEntity addToCart(CartItemRequest cartItemRequest) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ResponseEntity<CartItemResponse> getCart(Long userId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}
