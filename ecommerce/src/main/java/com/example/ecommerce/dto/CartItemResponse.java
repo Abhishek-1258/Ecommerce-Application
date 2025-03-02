@@ -23,6 +23,6 @@ public class CartItemResponse {
 	
 	private BigDecimal price;
 	
-	private ProductDTO product;
+	private ProductResponseDTO product;
 
 }
