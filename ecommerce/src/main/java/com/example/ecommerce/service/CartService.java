@@ -130,7 +130,7 @@ public class CartService {
 
 	}
 	
-	private User getUserFromUserService(Long userId) {
+	public User getUserFromUserService(Long userId) {
 		try {
 			return restTemplate.getForObject(userServiceUrl + userId, User.class);
 		} catch (Exception e) {

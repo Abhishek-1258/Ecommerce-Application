@@ -43,9 +43,6 @@ public class Order {
 	@JsonManagedReference
 	private List<OrderItem> orderItems = new ArrayList<OrderItem>();
 	
-	@ManyToOne
-	@JoinColumn(name = "cart_id")
-	private Cart cart;
 	
 	private BigDecimal totalPrice;
 

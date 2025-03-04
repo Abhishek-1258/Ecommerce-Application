@@ -30,7 +30,7 @@ public class OrderItem {
 	
 	private BigDecimal price;
 	
-	private int quantity;
+	private Long quantity;
 	
 	@ManyToOne
 	@JoinColumn(name = "order_id")

@@ -1,0 +1,12 @@
+package com.example.ecommerce.exceptions;
+
+public class CategoryAlreadyExistsException extends Exception {
+
+	public CategoryAlreadyExistsException(String message) {
+		super(message);
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+
+}

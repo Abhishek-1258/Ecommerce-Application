@@ -1,0 +1,27 @@
+package com.example.ecommerce.service;
+
+import org.springframework.stereotype.Service;
+
+import com.example.ecommerce.dto.CartResponseDto;
+import com.example.ecommerce.dto.OrderRequestDto;
+import com.example.ecommerce.model.Order;
+
+import jakarta.transaction.Transactional;
+
+@Service
+public class OrderService {
+	
+	private CartService cartService;
+	
+	public OrderService(CartService cartService) {
+		this.cartService = cartService;
+	}
+	
+	@Transactional
+	public Order placeOrder(OrderRequestDto orderRequestDto) {
+		CartResponseDto cartResponseDto = cartService.getCart(orderRequestDto.getUserId());
+		
+		
+	}
+
+}

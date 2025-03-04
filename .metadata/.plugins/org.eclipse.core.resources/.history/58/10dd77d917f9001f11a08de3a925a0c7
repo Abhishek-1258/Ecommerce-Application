@@ -1,0 +1,49 @@
+package com.example.ecommerce.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.example.ecommerce.dto.CartResponseDto;
+import com.example.ecommerce.dto.OrderRequestDto;
+import com.example.ecommerce.model.CartItem;
+import com.example.ecommerce.model.Order;
+import com.example.ecommerce.model.OrderItem;
+import com.example.ecommerce.model.User;
+
+import jakarta.transaction.Transactional;
+
+@Service
+public class OrderService {
+	
+	private CartService cartService;
+	
+	public OrderService(CartService cartService) {
+		this.cartService = cartService;
+	}
+	
+	@Transactional
+	public Order placeOrder(OrderRequestDto orderRequestDto) {
+		CartResponseDto cartResponseDto = cartService.getCart(orderRequestDto.getUserId());
+		User user = cartService.getUserFromUserService(orderRequestDto.getUserId());
+		List<CartItem> cartItems = cartResponseDto.getCartItems();
+		Order order = Order.builder()
+				.user(user)
+				.totalPrice(cartResponseDto.getTotalPrice())
+				.build();
+		
+		for (CartItem cartItem : cartItems) {
+			OrderItem orderItem = new OrderItem();
+			orderItem.setOrder(order);
+			orderItem.setProduct(cartItem.getProduct());
+			orderItem.setQuantity(cartItem.getQuantity());
+			orderItem.setPrice(cartItem.getProduct().getPrice()); 
+			
+			order.getOrderItems().add(orderItem);
+			
+			cartService.deleteCartItem(cartItem.getId(), orderRequestDto.getUserId());
+	}
+	
+	
+
+}

@@ -1,0 +1,104 @@
+package com.example.ecommerce.service;
+import java.math.BigDecimal;
+import java.util.Optional;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.example.ecommerce.dto.CartItemRequest;
+import com.example.ecommerce.dto.CartItemResponse;
+import com.example.ecommerce.dto.ProductResponseDTO;
+import com.example.ecommerce.exceptions.CartNotFoundException;
+import com.example.ecommerce.exceptions.ProductNotFoundException;
+
+import com.example.ecommerce.model.CartItem;
+import com.example.ecommerce.model.Product;
+import com.example.ecommerce.model.User;
+import com.example.ecommerce.repository.CartRepository;
+import com.example.ecommerce.repository.ProductRepository;
+import com.example.ecommerce.model.Cart;
+
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+
+@Service
+public class CartService {
+
+	private final CartRepository cartRepository;
+
+	private final ProductRepository productRepository;
+
+	private final RestTemplate restTemplate;
+
+	private final String userServiceUrl = "http://USER-SERVICE/users/";
+
+	public CartService(CartRepository cartRepository,ProductRepository productRepository,RestTemplate restTemplate) {
+		this.cartRepository = cartRepository;
+		this.productRepository = productRepository;
+		this.restTemplate = restTemplate;
+	}
+
+	@Transactional
+	public ResponseEntity addToCart(CartItemRequest cartItemRequest) {
+		Cart cart = cartRepository.findById(cartItemRequest.getCartId()).orElseThrow(() -> new CartNotFoundException("Cart Id was not found"));
+
+		User user = getUserFromUserService(cartItemRequest.getUserId());
+
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("user not found");
+		}
+
+		Product product = productRepository.findById(cartItemRequest.getProductId()).orElseThrow(() -> new ProductNotFoundException("Product was not found"));
+
+		Optional<CartItem> existingItem = cart.getItems().stream().filter(item -> item.getProduct().equals(product)).findFirst();
+
+		if (existingItem.isPresent()) {
+			CartItem item = existingItem.get();
+			item.setQuantity(item.getQuantity() + cartItemRequest.getQuantity());
+			item.setPrice(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+		} else {
+			CartItem cartItem = CartItem.builder()
+					.cart(cart)
+					.product(product)
+					.price(product.getPrice().multiply(BigDecimal.valueOf(cartItemRequest.getQuantity())))
+					.quantity(cartItemRequest.getQuantity())
+					.build();
+			cart.getItems().add(cartItem);
+		}
+
+		BigDecimal totalPrice = cart.getItems().stream().map(CartItem::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		cart.setTotalPrice(totalPrice);
+		cartRepository.save(cart);
+
+		return ResponseEntity.ok(cart);
+	}
+
+	private User getUserFromUserService(Long userId) {
+		try {
+			return restTemplate.getForObject(userServiceUrl + userId, User.class);
+		} catch (Exception e) {
+			throw new RuntimeException();
+		}
+	}
+
+
+	public CartItemResponse getCart(Long userId) {
+
+		return null;
+	}
+
+	public void deleteCartItem(Long cartItemId, Long userId) {
+
+
+	}
+
+
+	public void updateCartItem(@Valid CartItemRequest cartItemRequest, Long userId, ProductResponseDTO product) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

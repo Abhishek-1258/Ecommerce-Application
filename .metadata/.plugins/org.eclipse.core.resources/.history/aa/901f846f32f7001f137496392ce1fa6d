@@ -1,0 +1,8 @@
+package com.example.ecommerce.repository;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class CartRepository {
+
+}

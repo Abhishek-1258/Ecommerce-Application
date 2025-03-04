@@ -1,0 +1,80 @@
+package com.example.ecommerce.service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import com.example.ecommerce.dto.ProductDTO;
+import com.example.ecommerce.dto.ProductResponseDTO;
+import com.example.ecommerce.exceptions.ProductNotFoundException;
+import com.example.ecommerce.model.Product;
+import com.example.ecommerce.repository.ProductRepository;
+
+import jakarta.validation.Valid;
+
+@Service
+public class ProductService {
+	
+	private ProductRepository productRepository;
+	
+	public ProductService(ProductRepository productRepository) {
+		this.productRepository = productRepository;
+	}
+	
+	private List<ProductResponseDTO> mapProductsToDTO(List<Product> products) {
+	    if (products.isEmpty()) {
+	        throw new ProductNotFoundException("No Products Found");
+	    }
+	    
+	    return products.stream()
+	            .map(product -> ProductResponseDTO.builder()
+	                    .name(product.getName())
+	                    .price(product.getPrice())
+	                    .description(product.getDescription())
+	                    .category(product.getCategory().getName())
+	                    .build())
+	            .collect(Collectors.toList());
+	}
+
+	public List<ProductResponseDTO> getAllProducts() {
+		return mapProductsToDTO(productRepository.findAll());
+	}
+
+	public ProductResponseDTO getProductById(Long id) {
+		Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product with id : " + id + " was not found"));
+		return ProductResponseDTO.builder()
+				.name(product.getName())
+				.price(product.getPrice())
+				.description(product.getDescription())
+				.category(product.getCategory().getName())
+				.build();
+	}
+
+	public List<ProductResponseDTO> getProductsByCategory(Long categoryId) {
+	    return mapProductsToDTO(productRepository.getProductsByCategoryId(categoryId));
+	}
+
+	public List<ProductResponseDTO> getProductsByCategoryName(String categoryName) {
+	    return mapProductsToDTO(productRepository.getProductsByCategoryName(categoryName));
+	}
+
+	public ResponseEntity<String> createProduct(ProductDTO productDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ResponseEntity<String> updateProduct(ProductDTO productDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ResponseEntity<String> deleteProduct(Long id) {
+		if(!productRepository.existsById(id)) {
+			
+		}
+		return null;
+	}
+
+}

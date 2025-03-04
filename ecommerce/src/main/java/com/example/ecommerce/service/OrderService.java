@@ -1,0 +1,65 @@
+package com.example.ecommerce.service;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.example.ecommerce.dto.CartResponseDto;
+import com.example.ecommerce.dto.OrderRequestDto;
+import com.example.ecommerce.model.CartItem;
+import com.example.ecommerce.model.Order;
+import com.example.ecommerce.model.OrderItem;
+import com.example.ecommerce.model.User;
+import com.example.ecommerce.repository.OrderRepository;
+
+import jakarta.transaction.Transactional;
+
+@Service
+public class OrderService {
+
+	private final CartService cartService;
+
+	private final OrderRepository orderRepository;
+
+	public OrderService(CartService cartService,OrderRepository orderRepository) {
+		this.cartService = cartService;
+		this.orderRepository = orderRepository;
+	}
+
+	@Transactional
+	public Order placeOrder(OrderRequestDto orderRequestDto) {
+		CartResponseDto cartResponseDto = cartService.getCart(orderRequestDto.getUserId());
+		User user = cartService.getUserFromUserService(orderRequestDto.getUserId());
+		List<CartItem> cartItems = cartResponseDto.getCartItems();
+		Order order = new Order();
+		order.setUser(user);
+		 
+		for(CartItem cartItem : cartItems) {
+			OrderItem orderItem = new OrderItem();
+			orderItem.setOrder(order);
+			orderItem.setProduct(cartItem.getProduct());
+			orderItem.setQuantity(cartItem.getQuantity());
+			orderItem.setPrice(cartItem.getProduct().getPrice()); 
+
+			order.getOrderItems().add(orderItem);
+
+			cartService.deleteCartItem(cartItem.getId(), orderRequestDto.getUserId());
+		}
+		
+		order.setTotalPrice(calculateTotalPrice(order.getOrderItems()));
+
+		order = orderRepository.save(order);
+
+		return order;
+
+	}
+
+	private BigDecimal calculateTotalPrice(List<OrderItem> orderItems) {
+		return orderItems.stream()
+				.map(OrderItem::getPrice)
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+	}
+}
+

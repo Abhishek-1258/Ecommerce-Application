@@ -1,0 +1,67 @@
+package com.example.ecommerce.controller;
+
+
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.ecommerce.dto.ProductDTO;
+import com.example.ecommerce.dto.ProductResponseDTO;
+import com.example.ecommerce.service.ProductService;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/api/products")
+public class ProductController {
+	
+	private final ProductService productService;
+	
+	public ProductController(ProductService productService) {
+		this.productService = productService;
+	}
+	
+	@GetMapping
+	public List<ProductResponseDTO> getAllProducts(){
+		return productService.getAllProducts();
+	}
+	
+	@GetMapping("/{id}")
+	public ProductResponseDTO getProductById(@PathVariable Long id) {
+		return productService.getProductById(id);
+	}
+	
+	@GetMapping("/categoryId")
+	public List<ProductResponseDTO> getProductsByCategory(@PathVariable String categoryId){
+		return productService.getProductsByCategory(categoryId);
+	}
+	
+	@GetMapping("/categoryName")
+	public List<ProductResponseDTO> getProductsByCategoryName(@PathVariable String categoryName){
+		return null;
+	}
+	
+	@PostMapping
+	public ResponseEntity<String> createProduct(@Valid @RequestBody ProductDTO productDTO) {
+		return null;
+	}
+	
+	@PutMapping("/{id}")
+	public ResponseEntity<String> updateProduct(@Valid @RequestBody ProductDTO productDTO){
+		return null;
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<String> deleteProduct(@PathVariable Long id){
+		return null;
+	}
+
+}
