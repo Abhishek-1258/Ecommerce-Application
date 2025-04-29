@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -38,10 +40,11 @@ public class CartService {
 
 	private final String userServiceUrl = "http://USER-SERVICE/users/";
 
-	public CartService(CartRepository cartRepository,ProductRepository productRepository,RestTemplate restTemplate) {
+	@Autowired
+	public CartService(CartRepository cartRepository,ProductRepository productRepository,RestTemplateBuilder restTemplateBuilder) {
 		this.cartRepository = cartRepository;
 		this.productRepository = productRepository;
-		this.restTemplate = restTemplate;
+		this.restTemplate = restTemplateBuilder.build();
 	}
 
 	@Transactional

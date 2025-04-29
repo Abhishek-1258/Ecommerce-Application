@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +33,7 @@ public class ProductController {
 		this.productService = productService;
 	}
 	
+	
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public List<ProductResponseDTO> getAllProducts(){
@@ -56,18 +58,21 @@ public class ProductController {
 		return productService.getProductsByCategoryName(categoryName);
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<String> createProduct(@Valid @RequestBody ProductDTO productDTO) {
 		return productService.createProduct(productDTO);
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<String> updateProduct(@Valid @RequestBody ProductUpdateDTO productDTO){
 		return productService.updateProduct(productDTO);
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<String> deleteProduct(@PathVariable Long id){
